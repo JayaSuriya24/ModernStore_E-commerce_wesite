@@ -1,65 +1,162 @@
-import Image from "next/image";
+import Link from 'next/link';
+import { ArrowRight, ShoppingBag, Shield, Truck, RotateCcw } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
+
+const features = [
+  {
+    icon: Truck,
+    title: 'Free Shipping',
+    description: 'Free shipping on orders over $50',
+  },
+  {
+    icon: Shield,
+    title: 'Secure Payment',
+    description: '100% secure payment processing',
+  },
+  {
+    icon: RotateCcw,
+    title: 'Easy Returns',
+    description: '30-day hassle-free returns',
+  },
+  {
+    icon: ShoppingBag,
+    title: 'Premium Quality',
+    description: 'Curated selection of top products',
+  },
+];
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <div className="flex flex-col">
+      <section className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjMiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-10" />
+        <div className="relative mx-auto max-w-7xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
+          <div className="max-w-2xl">
+            <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl">
+              Discover
+              <span className="block text-yellow-300">Premium Products</span>
+            </h1>
+            <p className="mt-6 text-lg leading-8 text-blue-100">
+              Experience shopping reimagined with curated collections, secure checkout, and
+              lightning-fast delivery. Your style, your way.
+            </p>
+            <div className="mt-10 flex items-center gap-4">
+              <Link href="/products">
+                <Button size="lg" variant="secondary" className="gap-2">
+                  Shop Now <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+              <Link href="/products?category=new">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-white/30 text-white hover:bg-white/10"
+                >
+                  New Arrivals
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
+          {features.map((feature) => (
+            <div
+              key={feature.title}
+              className="glass rounded-xl p-6 text-center transition-all hover:shadow-lg"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+              <feature.icon className="mx-auto h-10 w-10 text-primary" />
+              <h3 className="mt-4 text-sm font-semibold text-foreground">{feature.title}</h3>
+              <p className="mt-1 text-xs text-muted-foreground">{feature.description}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold text-foreground">Featured Categories</h2>
+          <p className="mt-2 text-muted-foreground">Explore our curated collections</p>
+        </div>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {['Electronics', 'Clothing', 'Home & Living'].map((category) => (
+            <Link
+              key={category}
+              href={`/products?category=${category.toLowerCase().replace(/\s+/g, '-')}`}
+              className="group relative overflow-hidden rounded-xl bg-muted transition-all hover:shadow-lg"
             >
-              Learning
-            </a>{" "}
-            center.
+              <div className="aspect-[4/3] flex items-center justify-center bg-gradient-to-br from-primary/10 to-primary/5">
+                <ShoppingBag className="h-16 w-16 text-primary/30 transition-transform group-hover:scale-110" />
+              </div>
+              <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/60 to-transparent p-6">
+                <div>
+                  <h3 className="text-xl font-semibold text-white">{category}</h3>
+                  <p className="mt-1 text-sm text-white/80">Explore Collection</p>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="bg-muted/50 py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-foreground">Why Choose Us</h2>
+            <p className="mt-2 text-muted-foreground">
+              We are committed to providing the best shopping experience
+            </p>
+          </div>
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+            {[
+              {
+                title: 'Curated Selection',
+                description:
+                  'Every product is carefully selected for quality, design, and value.',
+                stat: '10,000+',
+                label: 'Products',
+              },
+              {
+                title: 'Fast Delivery',
+                description:
+                  'Lightning-fast shipping with real-time tracking on every order.',
+                stat: '2-Day',
+                label: 'Average Delivery',
+              },
+              {
+                title: 'Happy Customers',
+                description:
+                  'Join thousands of satisfied customers who love shopping with us.',
+                stat: '50,000+',
+                label: 'Reviews',
+              },
+            ].map((item) => (
+              <div key={item.title} className="glass rounded-xl p-8 text-center">
+                <div className="text-4xl font-bold gradient-text">{item.stat}</div>
+                <div className="mt-1 text-sm font-medium text-muted-foreground">{item.label}</div>
+                <h3 className="mt-4 text-lg font-semibold text-foreground">{item.title}</h3>
+                <p className="mt-2 text-sm text-muted-foreground">{item.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-bold text-foreground">Ready to Start Shopping?</h2>
+          <p className="mt-2 text-muted-foreground">
+            Browse our collection and find something you love.
           </p>
+          <Link href="/products" className="mt-8 inline-block">
+            <Button size="lg" className="gap-2">
+              Browse All Products <ArrowRight className="h-4 w-4" />
+            </Button>
+          </Link>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+      </section>
     </div>
   );
 }
