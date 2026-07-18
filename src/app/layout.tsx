@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import { Suspense } from 'react';
 import { ThemeProvider } from '@/components/layout/ThemeProvider';
 import { QueryProvider } from '@/components/providers/QueryProvider';
+import { SmoothScroll } from '@/components/providers/SmoothScroll';
+import { PageTransition } from '@/components/providers/PageTransition';
 import { ToastProvider } from '@/components/ui/Toast';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
@@ -42,17 +44,21 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
       <body className="min-h-screen flex flex-col bg-background text-foreground antialiased">
-        <ThemeProvider>
-          <QueryProvider>
-            <ToastProvider>
-              <Navbar />
-              <main className="flex-1">
-                <Suspense>{children}</Suspense>
-              </main>
-              <Footer />
-            </ToastProvider>
-          </QueryProvider>
-        </ThemeProvider>
+        <SmoothScroll>
+          <ThemeProvider>
+            <QueryProvider>
+              <ToastProvider>
+                <Navbar />
+                <main className="flex-1">
+                  <Suspense>
+                    <PageTransition>{children}</PageTransition>
+                  </Suspense>
+                </main>
+                <Footer />
+              </ToastProvider>
+            </QueryProvider>
+          </ThemeProvider>
+        </SmoothScroll>
       </body>
     </html>
   );

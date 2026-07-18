@@ -87,7 +87,10 @@ export function Navbar() {
             <Link href="/cart">
               <Button variant="ghost" size="icon" aria-label="Cart" className="relative">
                 <ShoppingBag className="h-5 w-5" />
-                <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                <span
+                  suppressHydrationWarning
+                  className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground transition-transform duration-200"
+                >
                   {cartItemCount > 99 ? '99+' : cartItemCount}
                 </span>
               </Button>

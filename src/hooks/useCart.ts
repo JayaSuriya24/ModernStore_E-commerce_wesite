@@ -29,6 +29,15 @@ async function fetcher<T>(url: string, options?: RequestInit): Promise<T> {
   return json;
 }
 
+export interface CartProductData {
+  id: string;
+  name: string;
+  slug: string;
+  price: number;
+  images: string[];
+  stock: number;
+}
+
 export function useCart() {
   const { data: session } = useSession();
   const isLoggedIn = !!session?.data;
@@ -55,29 +64,61 @@ export function useCart() {
   }, [cartQuery.data]);
 
   const addToCart = useMutation({
-    mutationFn: (data: { productId: string; quantity?: number }) =>
-      fetcher<{ data: ApiCartItem; message: string }>('/api/cart', {
+    mutationFn: async (data: {
+      productId: string;
+      quantity?: number;
+      product?: CartProductData;
+    }) => {
+      if (!isLoggedIn) {
+        if (!data.product) throw new Error('Product data required for guest cart');
+        return {
+          data: {
+            id: `local-${data.productId}-${Date.now()}`,
+            productId: data.productId,
+            quantity: data.quantity || 1,
+            product: data.product,
+          },
+          message: 'Added to cart',
+        };
+      }
+      return fetcher<{ data: ApiCartItem; message: string }>('/api/cart', {
         method: 'POST',
-        body: JSON.stringify(data),
-      }),
-    onSuccess: (data) => {
-      store.addItem({
-        id: data.data.id,
-        productId: data.data.productId,
-        quantity: data.data.quantity,
-        product: data.data.product,
+        body: JSON.stringify({
+          productId: data.productId,
+          quantity: data.quantity,
+        }),
       });
-      queryClient.invalidateQueries({ queryKey: ['cart'] });
+    },
+    onSuccess: (result) => {
+      store.addItem({
+        id: result.data.id,
+        productId: result.data.productId,
+        quantity: result.data.quantity,
+        product: result.data.product,
+      });
+      if (isLoggedIn) {
+        queryClient.invalidateQueries({ queryKey: ['cart'] });
+      }
     },
   });
 
   const updateQuantity = useMutation({
-    mutationFn: (data: { itemId: string; quantity: number }) =>
-      fetcher<{ data: ApiCartItem; message: string }>(`/api/cart/${data.itemId}`, {
+    mutationFn: (data: { itemId: string; quantity: number }) => {
+      if (!isLoggedIn) {
+        if (data.quantity <= 0) {
+          store.removeItem(data.itemId);
+        } else {
+          store.updateItem(data.itemId, data.quantity);
+        }
+        return Promise.resolve({ message: 'Updated' });
+      }
+      return fetcher<{ data: ApiCartItem; message: string }>(`/api/cart/${data.itemId}`, {
         method: 'PUT',
         body: JSON.stringify({ quantity: data.quantity }),
-      }),
+      });
+    },
     onSuccess: (_data, variables) => {
+      if (!isLoggedIn) return;
       if (variables.quantity <= 0) {
         store.removeItem(variables.itemId);
       } else {
@@ -88,9 +129,15 @@ export function useCart() {
   });
 
   const removeItem = useMutation({
-    mutationFn: (itemId: string) =>
-      fetcher<{ message: string }>(`/api/cart/${itemId}`, { method: 'DELETE' }),
+    mutationFn: (itemId: string) => {
+      if (!isLoggedIn) {
+        store.removeItem(itemId);
+        return Promise.resolve({ message: 'Removed' });
+      }
+      return fetcher<{ message: string }>(`/api/cart/${itemId}`, { method: 'DELETE' });
+    },
     onSuccess: (_data, itemId) => {
+      if (!isLoggedIn) return;
       store.removeItem(itemId);
       queryClient.invalidateQueries({ queryKey: ['cart'] });
     },
@@ -98,7 +145,16 @@ export function useCart() {
 
   const applyCoupon = useMutation({
     mutationFn: (data: { code: string; subtotal: number }) =>
-      fetcher<{ data: { id: string; code: string; type: string; discount: number; discountAmount: number }; message: string }>('/api/coupons', {
+      fetcher<{
+        data: {
+          id: string;
+          code: string;
+          type: string;
+          discount: number;
+          discountAmount: number;
+        };
+        message: string;
+      }>('/api/coupons', {
         method: 'POST',
         body: JSON.stringify(data),
       }),

@@ -13,21 +13,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-function useIsClient() {
-  return React.useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false,
-  );
-}
-
 function ThemeToggleInner() {
   const { resolvedTheme, setTheme } = useTheme();
-  const mounted = useIsClient();
-
-  if (!mounted) {
-    return <Button variant="ghost" size="icon" className="h-9 w-9" />;
-  }
 
   return (
     <Button
@@ -45,9 +32,15 @@ function ThemeToggleInner() {
 }
 
 export function ThemeToggle() {
-  return (
-    <NextThemesProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-      <ThemeToggleInner />
-    </NextThemesProvider>
-  );
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return <Button variant="ghost" size="icon" className="h-9 w-9" aria-label="Toggle theme" />;
+  }
+
+  return <ThemeToggleInner />;
 }

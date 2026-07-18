@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import { ArrowRight, ShoppingBag, Shield, Truck, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
@@ -24,6 +27,20 @@ const features = [
     description: 'Curated selection of top products',
   },
 ];
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: 'easeOut' as const },
+  },
+};
+
+const staggerContainer = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.12 } },
+};
 
 export default function Home() {
   return (
@@ -60,55 +77,75 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+      <motion.section
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: '-50px' }}
+        className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8"
+      >
         <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
           {features.map((feature) => (
-            <div
+            <motion.div
               key={feature.title}
+              variants={fadeUp}
               className="glass rounded-xl p-6 text-center transition-all hover:shadow-lg"
             >
               <feature.icon className="mx-auto h-10 w-10 text-primary" />
               <h3 className="mt-4 text-sm font-semibold text-foreground">{feature.title}</h3>
               <p className="mt-1 text-xs text-muted-foreground">{feature.description}</p>
-            </div>
+            </motion.div>
           ))}
         </div>
-      </section>
+      </motion.section>
 
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
+      <motion.section
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: '-50px' }}
+        className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8"
+      >
+        <motion.div variants={fadeUp} className="text-center mb-12">
           <h2 className="text-3xl font-bold text-foreground">Featured Categories</h2>
           <p className="mt-2 text-muted-foreground">Explore our curated collections</p>
-        </div>
+        </motion.div>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {['Electronics', 'Clothing', 'Home & Living'].map((category) => (
-            <Link
-              key={category}
-              href={`/products?category=${category.toLowerCase().replace(/\s+/g, '-')}`}
-              className="group relative overflow-hidden rounded-xl bg-muted transition-all hover:shadow-lg"
-            >
-              <div className="aspect-[4/3] flex items-center justify-center bg-gradient-to-br from-primary/10 to-primary/5">
-                <ShoppingBag className="h-16 w-16 text-primary/30 transition-transform group-hover:scale-110" />
-              </div>
-              <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/60 to-transparent p-6">
-                <div>
-                  <h3 className="text-xl font-semibold text-white">{category}</h3>
-                  <p className="mt-1 text-sm text-white/80">Explore Collection</p>
+            <motion.div key={category} variants={fadeUp}>
+              <Link
+                href={`/products?category=${category.toLowerCase().replace(/\s+/g, '-')}`}
+                className="group relative block overflow-hidden rounded-xl bg-muted transition-all hover:shadow-lg"
+              >
+                <div className="aspect-[4/3] flex items-center justify-center bg-gradient-to-br from-primary/10 to-primary/5">
+                  <ShoppingBag className="h-16 w-16 text-primary/30 transition-transform group-hover:scale-110" />
                 </div>
-              </div>
-            </Link>
+                <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/60 to-transparent p-6">
+                  <div>
+                    <h3 className="text-xl font-semibold text-white">{category}</h3>
+                    <p className="mt-1 text-sm text-white/80">Explore Collection</p>
+                  </div>
+                </div>
+              </Link>
+            </motion.div>
           ))}
         </div>
-      </section>
+      </motion.section>
 
-      <section className="bg-muted/50 py-16">
+      <motion.section
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: '-50px' }}
+        className="bg-muted/50 py-16"
+      >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
+          <motion.div variants={fadeUp} className="text-center mb-12">
             <h2 className="text-3xl font-bold text-foreground">Why Choose Us</h2>
             <p className="mt-2 text-muted-foreground">
               We are committed to providing the best shopping experience
             </p>
-          </div>
+          </motion.div>
           <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
             {[
               {
@@ -133,18 +170,24 @@ export default function Home() {
                 label: 'Reviews',
               },
             ].map((item) => (
-              <div key={item.title} className="glass rounded-xl p-8 text-center">
+              <motion.div key={item.title} variants={fadeUp} className="glass rounded-xl p-8 text-center">
                 <div className="text-4xl font-bold gradient-text">{item.stat}</div>
                 <div className="mt-1 text-sm font-medium text-muted-foreground">{item.label}</div>
                 <h3 className="mt-4 text-lg font-semibold text-foreground">{item.title}</h3>
                 <p className="mt-2 text-sm text-muted-foreground">{item.description}</p>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
-      </section>
+      </motion.section>
 
-      <section className="py-16">
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6, ease: 'easeOut' }}
+        className="py-16"
+      >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-foreground">Ready to Start Shopping?</h2>
           <p className="mt-2 text-muted-foreground">
@@ -156,7 +199,7 @@ export default function Home() {
             </Button>
           </Link>
         </div>
-      </section>
+      </motion.section>
     </div>
   );
 }

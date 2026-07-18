@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { motion } from 'framer-motion';
 import { Star, ShoppingCart, Minus, Plus, Truck, Shield, RotateCcw, ChevronLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -13,27 +14,52 @@ import { ReviewList } from '@/components/reviews/ReviewList';
 import { RatingBreakdown } from '@/components/reviews/RatingBreakdown';
 import { WishlistButton } from '@/components/wishlist/WishlistButton';
 import { RelatedProducts } from '@/components/products/RelatedProducts';
+import { useCart } from '@/hooks/useCart';
 import type { Product, Review } from '@/types';
 
 interface ProductDetailProps {
   product: Product;
 }
 
+const container = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const item = {
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' as const } },
+};
+
 export function ProductDetail({ product }: ProductDetailProps) {
   const [quantity, setQuantity] = React.useState(1);
   const [selectedImage, setSelectedImage] = React.useState(0);
   const router = useRouter();
+  const { addToCart } = useCart();
   const discount = calculateDiscount(product.price, product.compareAtPrice || 0);
   const rating = product.averageRating || 0;
   const reviews = (product as Product & { reviews?: Review[] }).reviews || [];
 
   return (
-    <div className="space-y-8">
-      <Button variant="ghost" size="sm" onClick={() => router.back()} className="gap-1">
-        <ChevronLeft className="h-4 w-4" /> Back
-      </Button>
+    <motion.div
+      className="space-y-8"
+      variants={container}
+      initial="hidden"
+      animate="show"
+    >
+      <motion.div variants={item}>
+        <Button variant="ghost" size="sm" onClick={() => router.back()} className="gap-1">
+          <ChevronLeft className="h-4 w-4" /> Back
+        </Button>
+      </motion.div>
 
-      <div className="grid gap-8 lg:grid-cols-2">
+      <motion.div variants={item} className="grid gap-8 lg:grid-cols-2">
         <div className="space-y-4">
           <div className="relative aspect-square overflow-hidden rounded-xl border bg-muted">
             <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/5 to-primary/10 text-primary/20">
@@ -144,7 +170,26 @@ export function ProductDetail({ product }: ProductDetailProps) {
                   <Plus className="h-4 w-4" />
                 </button>
               </div>
-              <Button size="lg" className="flex-1 gap-2">
+              <Button
+                size="lg"
+                className="flex-1 gap-2"
+                onClick={() =>
+                  addToCart.mutate({
+                    productId: product.id,
+                    quantity,
+                    product: {
+                      id: product.id,
+                      name: product.name,
+                      slug: product.slug,
+                      price: product.price,
+                      images: product.images,
+                      stock: product.stock,
+                    },
+                  })
+                }
+                disabled={addToCart.isPending}
+                isLoading={addToCart.isPending}
+              >
                 <ShoppingCart className="h-5 w-5" /> Add to Cart
               </Button>
               <WishlistButton productId={product.id} size="lg" />
@@ -166,16 +211,18 @@ export function ProductDetail({ product }: ProductDetailProps) {
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
-      <div className="space-y-6">
+      <motion.div variants={item} className="space-y-6">
         <h2 className="text-2xl font-bold text-foreground">Customer Reviews</h2>
         <RatingBreakdown reviews={reviews} />
         <ReviewForm productId={product.id} />
         <ReviewList reviews={reviews} />
-      </div>
+      </motion.div>
 
-      <RelatedProducts categoryId={product.categoryId} currentProductId={product.id} />
-    </div>
+      <motion.div variants={item}>
+        <RelatedProducts categoryId={product.categoryId} currentProductId={product.id} />
+      </motion.div>
+    </motion.div>
   );
 }
