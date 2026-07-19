@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { Star } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { Card, CardContent } from '@/components/ui/Card';
@@ -25,7 +26,7 @@ export function ReviewList({ reviews }: ReviewListProps) {
             <div className="flex items-start gap-4">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
                 {review.user?.avatar ? (
-                  <img src={review.user.avatar} alt="" className="h-10 w-10 rounded-full object-cover" />
+                  <Image src={review.user.avatar} alt="" width={40} height={40} className="h-10 w-10 rounded-full object-cover" unoptimized />
                 ) : (
                   getInitials(review.user?.name || 'U')
                 )}

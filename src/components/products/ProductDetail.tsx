@@ -44,7 +44,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
   const { addToCart } = useCart();
   const discount = calculateDiscount(product.price, product.compareAtPrice || 0);
   const rating = product.averageRating || 0;
-  const reviews = (product as Product & { reviews?: Review[] }).reviews || [];
+  const reviews = (product.reviews as Review[] | undefined) || [];
 
   return (
     <motion.div

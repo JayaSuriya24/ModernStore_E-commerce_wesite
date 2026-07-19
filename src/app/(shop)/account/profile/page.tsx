@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { useToast } from '@/components/ui/Toast';
 import { Skeleton } from '@/components/ui/Skeleton';
+import Image from 'next/image';
 import { formatDate, getInitials } from '@/utils/formatters';
 
 export default function ProfilePage() {
@@ -56,7 +57,7 @@ export default function ProfilePage() {
           <div className="flex items-start gap-6">
             <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 text-xl font-bold text-primary">
               {profile?.avatar ? (
-                <img src={profile.avatar} alt={profile.name} className="h-20 w-20 rounded-full object-cover" />
+                <Image src={profile.avatar} alt={profile.name} width={80} height={80} className="h-20 w-20 rounded-full object-cover" unoptimized />
               ) : (
                 getInitials(profile?.name || 'U')
               )}

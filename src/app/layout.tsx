@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
+import Script from 'next/script';
 import { Suspense } from 'react';
 import { ThemeProvider } from '@/components/layout/ThemeProvider';
 import { QueryProvider } from '@/components/providers/QueryProvider';
@@ -44,6 +45,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
       <body className="min-h-screen flex flex-col bg-background text-foreground antialiased">
+        <Script id="theme-init" strategy="beforeInteractive">
+          {`(function(){try{var t=localStorage.getItem('theme')||'system';var r=document.documentElement;var d=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';var v=t==='system'?d:t;r.classList.add(v)}catch(e){}})()`}
+        </Script>
         <SmoothScroll>
           <ThemeProvider>
             <QueryProvider>

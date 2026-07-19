@@ -26,9 +26,13 @@ const navLinks = [
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
+  const cartCount = React.useSyncExternalStore(
+    useCartStore.subscribe,
+    () => useCartStore.getState().getItemCount(),
+    () => 0,
+  );
   const pathname = usePathname();
   const prevPathname = React.useRef(pathname);
-  const cartItemCount = useCartStore((s) => s.getItemCount());
 
   React.useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -87,11 +91,8 @@ export function Navbar() {
             <Link href="/cart">
               <Button variant="ghost" size="icon" aria-label="Cart" className="relative">
                 <ShoppingBag className="h-5 w-5" />
-                <span
-                  suppressHydrationWarning
-                  className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground transition-transform duration-200"
-                >
-                  {cartItemCount > 99 ? '99+' : cartItemCount}
+                <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground transition-transform duration-200">
+                  {cartCount > 99 ? '99+' : cartCount}
                 </span>
               </Button>
             </Link>

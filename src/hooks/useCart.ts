@@ -41,7 +41,12 @@ export interface CartProductData {
 export function useCart() {
   const { data: session } = useSession();
   const isLoggedIn = !!session?.data;
-  const store = useCartStore();
+  const items = useCartStore((s) => s.items);
+  const couponCode = useCartStore((s) => s.couponCode);
+  const discountAmount = useCartStore((s) => s.discountAmount);
+  const subtotal = useCartStore((s) => s.getSubtotal());
+  const total = useCartStore((s) => s.getTotal());
+  const itemCount = useCartStore((s) => s.getItemCount());
   const queryClient = useQueryClient();
 
   const cartQuery = useQuery({
@@ -52,7 +57,7 @@ export function useCart() {
 
   useEffect(() => {
     if (cartQuery.data) {
-      store.setItems(
+      useCartStore.getState().setItems(
         cartQuery.data.data.map((item) => ({
           id: item.id,
           productId: item.productId,
@@ -90,7 +95,7 @@ export function useCart() {
       });
     },
     onSuccess: (result) => {
-      store.addItem({
+      useCartStore.getState().addItem({
         id: result.data.id,
         productId: result.data.productId,
         quantity: result.data.quantity,
@@ -106,9 +111,9 @@ export function useCart() {
     mutationFn: (data: { itemId: string; quantity: number }) => {
       if (!isLoggedIn) {
         if (data.quantity <= 0) {
-          store.removeItem(data.itemId);
+          useCartStore.getState().removeItem(data.itemId);
         } else {
-          store.updateItem(data.itemId, data.quantity);
+          useCartStore.getState().updateItem(data.itemId, data.quantity);
         }
         return Promise.resolve({ message: 'Updated' });
       }
@@ -120,9 +125,9 @@ export function useCart() {
     onSuccess: (_data, variables) => {
       if (!isLoggedIn) return;
       if (variables.quantity <= 0) {
-        store.removeItem(variables.itemId);
+        useCartStore.getState().removeItem(variables.itemId);
       } else {
-        store.updateItem(variables.itemId, variables.quantity);
+        useCartStore.getState().updateItem(variables.itemId, variables.quantity);
       }
       queryClient.invalidateQueries({ queryKey: ['cart'] });
     },
@@ -131,14 +136,14 @@ export function useCart() {
   const removeItem = useMutation({
     mutationFn: (itemId: string) => {
       if (!isLoggedIn) {
-        store.removeItem(itemId);
+        useCartStore.getState().removeItem(itemId);
         return Promise.resolve({ message: 'Removed' });
       }
       return fetcher<{ message: string }>(`/api/cart/${itemId}`, { method: 'DELETE' });
     },
     onSuccess: (_data, itemId) => {
       if (!isLoggedIn) return;
-      store.removeItem(itemId);
+      useCartStore.getState().removeItem(itemId);
       queryClient.invalidateQueries({ queryKey: ['cart'] });
     },
   });
@@ -159,24 +164,24 @@ export function useCart() {
         body: JSON.stringify(data),
       }),
     onSuccess: (data) => {
-      store.setCoupon(data.data.code, data.data.discountAmount);
+      useCartStore.getState().setCoupon(data.data.code, data.data.discountAmount);
     },
   });
 
   return {
-    items: store.items,
-    couponCode: store.couponCode,
-    discountAmount: store.discountAmount,
-    subtotal: store.getSubtotal(),
-    total: store.getTotal(),
-    itemCount: store.getItemCount(),
+    items,
+    couponCode,
+    discountAmount,
+    subtotal,
+    total,
+    itemCount,
     isLoading: cartQuery.isLoading,
     addToCart,
     updateQuantity,
     removeItem,
     applyCoupon,
-    removeCoupon: store.removeCoupon,
-    clearCart: store.clearCart,
+    removeCoupon: useCartStore.getState().removeCoupon,
+    clearCart: useCartStore.getState().clearCart,
     isSignedIn: isLoggedIn,
   };
 }
